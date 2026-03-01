@@ -2,6 +2,7 @@ const express = require("express");
 const mongoose = require("mongoose");
 const authRoutes = require("./routes/auth.routes");
 const userRoutes = require("./routes/user.routes");
+const videoRoutes = require("./routes/video.routes");
 require("dotenv").config();
 
 const app = express();
@@ -21,5 +22,6 @@ mongoose
 
 authRoutes(app);
 userRoutes(app);
+videoRoutes(app);
 
 module.exports = app;
