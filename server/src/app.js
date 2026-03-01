@@ -1,5 +1,7 @@
 const express = require("express");
 const mongoose = require("mongoose");
+const authRoutes = require("./routes/auth.routes");
+const userRoutes = require("./routes/user.routes");
 require("dotenv").config();
 
 const app = express();
@@ -14,5 +16,10 @@ mongoose
   .catch((error) => {
     console.error("Error connecting to MongoDB:", error);
   });
+
+//   =============== routes ===================
+
+authRoutes(app);
+userRoutes(app);
 
 module.exports = app;
