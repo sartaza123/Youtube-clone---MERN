@@ -3,6 +3,7 @@ const mongoose = require("mongoose");
 const authRoutes = require("./routes/auth.routes");
 const userRoutes = require("./routes/user.routes");
 const videoRoutes = require("./routes/video.routes");
+const channelRoutes = require("./routes/channel.routes");
 require("dotenv").config();
 
 const app = express();
@@ -23,5 +24,6 @@ mongoose
 authRoutes(app);
 userRoutes(app);
 videoRoutes(app);
+channelRoutes(app);
 
 module.exports = app;
