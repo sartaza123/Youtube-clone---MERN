@@ -10,7 +10,7 @@ import { FaGoogle } from "react-icons/fa";
 import { LuMenu } from "react-icons/lu";
 import YouTubeLogo from "../assets/YouTube_Logo.svg";
 
-function Header({ authUser, setAuthUser }) {
+function Header({ authUser, setAuthUser, sidebarOpen, setSidebarOpen }) {
   const navigate = useNavigate();
   const [openMenu, setOpenMenu] = useState(false);
   const menuRef = useRef();
@@ -36,7 +36,10 @@ function Header({ authUser, setAuthUser }) {
     <div className="w-full flex justify-between items-center px-4 py-2 border-b bg-white sticky top-0 z-50">
       {/* LEFT */}
       <div className="flex items-center gap-4">
-        <button className="text-xl hover:bg-gray-200 p-2 rounded-full transition">
+        <button
+          onClick={() => setSidebarOpen(!sidebarOpen)}
+          className="text-xl hover:bg-gray-200 p-2 rounded-full transition"
+        >
           <LuMenu />
         </button>
 
