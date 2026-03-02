@@ -4,6 +4,7 @@ const authRoutes = require("./routes/auth.routes");
 const userRoutes = require("./routes/user.routes");
 const videoRoutes = require("./routes/video.routes");
 const channelRoutes = require("./routes/channel.routes");
+const commentRoutes = require("./routes/comment.routes");
 require("dotenv").config();
 
 const app = express();
@@ -19,11 +20,16 @@ mongoose
     console.error("Error connecting to MongoDB:", error);
   });
 
-//   =============== routes ===================
+// ================= Middleware ===================
+
+app.use(express.json());
+
+// ================== routes ======================
 
 authRoutes(app);
 userRoutes(app);
 videoRoutes(app);
 channelRoutes(app);
+commentRoutes(app);
 
 module.exports = app;

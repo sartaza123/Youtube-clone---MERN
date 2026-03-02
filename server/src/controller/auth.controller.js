@@ -1,6 +1,7 @@
 const bcrypt = require("bcrypt");
 const jwt = require("jsonwebtoken");
 const userModel = require("../models/user.model");
+require("dotenv").config();
 
 // ================= REGISTER =================
 async function register(req, res) {
@@ -26,6 +27,7 @@ async function register(req, res) {
       email,
     });
   } catch (error) {
+    console.log(error);
     res.status(500).json({ message: "Server error" });
   }
 }
