@@ -5,6 +5,7 @@ const userRoutes = require("./routes/user.routes");
 const videoRoutes = require("./routes/video.routes");
 const channelRoutes = require("./routes/channel.routes");
 const commentRoutes = require("./routes/comment.routes");
+const cors = require("cors");
 require("dotenv").config();
 
 const app = express();
@@ -23,6 +24,7 @@ mongoose
 // ================= Middleware ===================
 
 app.use(express.json());
+app.use(cors());
 
 // ================== routes ======================
 
