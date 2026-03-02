@@ -7,6 +7,7 @@ import { FiPlus } from "react-icons/fi";
 import { CgProfile } from "react-icons/cg";
 import { MdOutlineLogout } from "react-icons/md";
 import { FaGoogle } from "react-icons/fa";
+import { LuMenu } from "react-icons/lu";
 import YouTubeLogo from "../assets/YouTube_Logo.svg";
 
 function Header({ authUser, setAuthUser }) {
@@ -36,7 +37,7 @@ function Header({ authUser, setAuthUser }) {
       {/* LEFT */}
       <div className="flex items-center gap-4">
         <button className="text-xl hover:bg-gray-200 p-2 rounded-full transition">
-          ☰
+          <LuMenu />
         </button>
 
         <img
