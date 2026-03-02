@@ -33,7 +33,7 @@ function Header({ authUser, setAuthUser, sidebarOpen, setSidebarOpen }) {
   }, []);
 
   return (
-    <div className="w-full flex justify-between items-center px-4 py-2 border-b bg-white sticky top-0 z-50">
+    <div className="w-full flex justify-between items-center px-4 py-2  bg-white sticky top-0 z-50">
       {/* LEFT */}
       <div className="flex items-center gap-4">
         <button

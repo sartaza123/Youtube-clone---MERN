@@ -1,5 +1,5 @@
-import { Outlet } from "react-router-dom";
 import { useState, useEffect } from "react";
+import { Outlet } from "react-router-dom";
 import Header from "./components/Header";
 import Sidebar from "./components/Sidebar";
 
@@ -9,13 +9,12 @@ function App() {
 
   useEffect(() => {
     const username = localStorage.getItem("username");
-    if (username) {
-      setAuthUser(username);
-    }
+    if (username) setAuthUser(username);
   }, []);
 
   return (
-    <>
+    <div className="h-screen flex flex-col">
+      {/* HEADER */}
       <Header
         authUser={authUser}
         setAuthUser={setAuthUser}
@@ -23,13 +22,17 @@ function App() {
         setSidebarOpen={setSidebarOpen}
       />
 
-      <div className="flex">
+      {/* BODY */}
+      <div className="flex flex-1 overflow-hidden">
+        {/* SIDEBAR */}
         <Sidebar sidebarOpen={sidebarOpen} />
-        <div className="flex-1">
+
+        {/* MAIN CONTENT */}
+        <main className="flex-1 min-w-0 overflow-y-auto bg-gray-50">
           <Outlet context={{ setAuthUser }} />
-        </div>
+        </main>
       </div>
-    </>
+    </div>
   );
 }
 
