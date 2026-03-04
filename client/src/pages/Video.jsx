@@ -81,7 +81,7 @@ function Video() {
         dislikes: res.data.dislikes,
       }));
     } catch (err) {
-      console.error(err);
+      console.error(err); // err handling
     }
   };
 
