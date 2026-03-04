@@ -7,10 +7,13 @@ import { RiPlayListAddLine } from "react-icons/ri";
 
 import API from "../services/api";
 import CommentSection from "../components/CommentSection";
+import { useAuth } from "../context/AuthContext";
 
 function Video() {
   const { id } = useParams();
   const navigate = useNavigate();
+
+  const { authUser } = useAuth();
 
   const [video, setVideo] = useState(null);
   const [suggestedVideos, setSuggestedVideos] = useState([]);
@@ -21,14 +24,25 @@ function Video() {
     fetchSuggestedVideos();
   }, [id]);
 
+  /* ================= FETCH VIDEO ================= */
+
   const fetchVideo = async () => {
     try {
       const res = await API.get(`/videos/${id}`);
-      setVideo(res.data);
+
+      const videoData = res.data;
+
+      // Ensure arrays exist
+      videoData.likes = videoData.likes || [];
+      videoData.dislikes = videoData.dislikes || [];
+
+      setVideo(videoData);
     } catch (err) {
       console.error(err);
     }
   };
+
+  /* ================= FETCH SUGGESTED ================= */
 
   const fetchSuggestedVideos = async () => {
     try {
@@ -42,20 +56,55 @@ function Video() {
     }
   };
 
+  /* ================= GET YOUTUBE ID ================= */
+
   const getYoutubeId = (url) => {
     const match = url.match(/(?:youtube\.com\/.*v=|youtu\.be\/)([^&?]+)/);
     return match ? match[1] : "";
   };
 
-  const formatViews = (num) => {
-    if (!num) return "0";
+  /* ================= LIKE VIDEO ================= */
 
-    if (num >= 1_000_000)
-      return (num / 1_000_000).toFixed(1).replace(".0", "") + "M";
+  const handleLike = async () => {
+    if (!authUser) {
+      alert("Please login to like videos");
+      navigate("/login");
+      return;
+    }
 
-    if (num >= 1_000) return (num / 1_000).toFixed(1).replace(".0", "") + "K";
+    try {
+      const res = await API.put(`/videos/${video._id}/like`);
 
-    return num;
+      setVideo((prev) => ({
+        ...prev,
+        likes: res.data.likes,
+        dislikes: res.data.dislikes,
+      }));
+    } catch (err) {
+      console.error(err);
+    }
+  };
+
+  /* ================= DISLIKE VIDEO ================= */
+
+  const handleDislike = async () => {
+    if (!authUser) {
+      alert("Please login to dislike videos");
+      navigate("/login");
+      return;
+    }
+
+    try {
+      const res = await API.put(`/videos/${video._id}/dislike`);
+
+      setVideo((prev) => ({
+        ...prev,
+        likes: res.data.likes,
+        dislikes: res.data.dislikes,
+      }));
+    } catch (err) {
+      console.error(err);
+    }
   };
 
   if (!video) return <div className="p-6">Loading...</div>;
@@ -63,85 +112,88 @@ function Video() {
   return (
     <div className="max-w-[1400px] mx-auto px-6 py-4">
       <div className="flex flex-col lg:flex-row gap-6">
-        {/* LEFT SECTION */}
+        {/* LEFT SIDE */}
         <div className="flex-1 lg:w-[70%]">
-          {/* Video Player */}
+          {/* VIDEO PLAYER */}
           <div className="w-full aspect-video">
             <iframe
               className="w-full h-full rounded-xl"
               src={`https://www.youtube.com/embed/${getYoutubeId(video.videoUrl)}`}
-              title="video"
               allowFullScreen
             />
           </div>
 
-          {/* Title */}
+          {/* TITLE */}
           <h1 className="text-xl font-semibold mt-4">{video.title}</h1>
 
-          {/* Channel + Buttons Row */}
-          <div className="flex flex-wrap justify-between items-center mt-4 gap-4">
-            {/* Channel Section */}
+          {/* CHANNEL + ACTIONS */}
+          <div className="flex justify-between items-center mt-4">
+            {/* CHANNEL */}
             <div className="flex items-center gap-4">
               <img
                 src={video.channel?.avatar || "/default-avatar.png"}
-                alt="channel"
-                className="w-10 h-10 rounded-full object-cover"
+                className="w-10 h-10 rounded-full"
               />
 
               <div>
                 <p className="font-semibold text-sm">
                   {video.channel?.channelName}
                 </p>
-
-                <p className="text-xs text-gray-500">
-                  {formatViews(video.channel?.subscribers || 0)} subscribers
-                </p>
               </div>
 
-              <button className="bg-black text-white px-4 py-2 rounded-full text-sm hover:bg-gray-800 transition">
+              <button className="bg-black text-white px-4 py-2 rounded-full text-sm">
                 Subscribe
               </button>
             </div>
 
-            {/* Action Buttons */}
+            {/* ACTION BUTTONS */}
             <div className="flex items-center gap-3 text-sm">
+              {/* LIKE DISLIKE GROUP */}
               <div className="flex items-center bg-gray-100 rounded-full overflow-hidden">
-                <button className="flex items-center gap-2 px-4 py-2 hover:bg-gray-200">
+                <button
+                  onClick={handleLike}
+                  className="flex items-center gap-2 px-4 py-2 hover:bg-gray-200"
+                >
                   <BiLike size={18} />
-                  {formatViews(video.likes)}
+                  {video.likes.length || 0}
                 </button>
 
                 <div className="h-6 w-[1px] bg-gray-300" />
 
-                <button className="px-4 py-2 hover:bg-gray-200">
+                <button
+                  onClick={handleDislike}
+                  className="flex items-center gap-2 px-4 py-2 hover:bg-gray-200"
+                >
                   <BiDislike size={18} />
+                  {video.dislikes.length || 0}
                 </button>
               </div>
 
+              {/* SHARE */}
               <button className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-full hover:bg-gray-200">
                 <FiShare size={18} />
                 Share
               </button>
 
+              {/* SAVE */}
               <button className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-full hover:bg-gray-200">
                 <RiPlayListAddLine size={18} />
                 Save
               </button>
 
+              {/* MORE */}
               <button className="p-2 bg-gray-100 rounded-full hover:bg-gray-200">
                 <BsThreeDots size={18} />
               </button>
             </div>
           </div>
 
-          {/* Description Box */}
+          {/* DESCRIPTION */}
           <div
             onClick={() => setShowFullDescription(!showFullDescription)}
             className="mt-6 bg-gray-100 p-4 rounded-xl text-sm cursor-pointer"
           >
-            <p className="font-semibold mb-2">
-              {formatViews(video.views)} views
-            </p>
+            <p>{video.views} views</p>
 
             <p
               className={`whitespace-pre-wrap ${
@@ -150,31 +202,16 @@ function Video() {
             >
               {video.description}
             </p>
-
-            {!showFullDescription && (
-              <p className="text-xs text-gray-600 mt-2 font-medium">
-                Show more
-              </p>
-            )}
-
-            {showFullDescription && (
-              <p className="text-xs text-gray-600 mt-2 font-medium">
-                Show less
-              </p>
-            )}
           </div>
 
-          {/* Comments */}
+          {/* COMMENTS */}
           <div className="mt-8">
-            <CommentSection
-              videoId={video._id}
-              currentUser={localStorage.getItem("username")}
-            />
+            <CommentSection videoId={video._id} />
           </div>
         </div>
 
-        {/* RIGHT SECTION (Suggested Videos) */}
-        <div className="lg:w-[30%] w-full space-y-4">
+        {/* RIGHT SIDE (SUGGESTED VIDEOS) */}
+        <div className="lg:w-[30%] space-y-4">
           {suggestedVideos.map((item) => (
             <div
               key={item._id}
@@ -183,7 +220,6 @@ function Video() {
             >
               <img
                 src={item.thumbnailUrl}
-                alt={item.title}
                 className="w-40 h-24 object-cover rounded-lg"
               />
 

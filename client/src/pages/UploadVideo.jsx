@@ -1,52 +1,67 @@
 import { useState, useEffect } from "react";
 import API from "../services/api";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 function UploadVideo() {
   const navigate = useNavigate();
+  const location = useLocation();
+
+  const { token } = useAuth();
+
+  const editVideo = location.state;
 
   const [channelId, setChannelId] = useState("");
+
   const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    thumbnailUrl: "",
-    videoUrl: "",
-    category: "",
+    title: editVideo?.title || "",
+    description: editVideo?.description || "",
+    thumbnailUrl: editVideo?.thumbnailUrl || "",
+    videoUrl: editVideo?.videoUrl || "",
+    category: editVideo?.category || "",
   });
 
   const [loading, setLoading] = useState(false);
 
+  /* ================= AUTH CHECK ================= */
+
+  useEffect(() => {
+    if (!token) navigate("/login");
+  }, [token, navigate]);
+
   /* ================= GET MY CHANNEL ================= */
+
   useEffect(() => {
     const fetchChannel = async () => {
       try {
-        const token = localStorage.getItem("token");
+        const { data } = await API.get("/my-channel");
 
-        const { data } = await API.get("/my-channel", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
+        if (!data || !data._id) {
+          alert("You must create a channel before uploading videos.");
+          navigate("/create-channel");
+          return;
+        }
 
         setChannelId(data._id);
       } catch (err) {
-        console.error("Channel not found");
+        console.error(err);
+        navigate("/create-channel");
       }
     };
 
     fetchChannel();
-  }, []);
+  }, [navigate]);
 
   /* ================= HANDLE INPUT ================= */
 
   const handleChange = (e) => {
-    setFormData({
-      ...formData,
+    setFormData((prev) => ({
+      ...prev,
       [e.target.name]: e.target.value,
-    });
+    }));
   };
 
-  /* ================= UPLOAD VIDEO ================= */
+  /* ================= UPLOAD / UPDATE VIDEO ================= */
 
   const handleUpload = async (e) => {
     e.preventDefault();
@@ -54,27 +69,23 @@ function UploadVideo() {
     setLoading(true);
 
     try {
-      const token = localStorage.getItem("token");
+      if (editVideo) {
+        await API.put(`/videos/${editVideo._id}`, formData);
 
-      await API.post(
-        "/videos",
-        {
+        alert("Video updated successfully");
+      } else {
+        await API.post("/videos", {
           ...formData,
           channel: channelId,
-        },
-        {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        },
-      );
+        });
 
-      alert("Video uploaded successfully");
+        alert("Video uploaded successfully");
+      }
 
       navigate(`/channel/${channelId}`);
     } catch (err) {
       console.error(err);
-      alert("Upload failed");
+      alert("Operation failed");
     } finally {
       setLoading(false);
     }
@@ -82,7 +93,9 @@ function UploadVideo() {
 
   return (
     <div className="max-w-3xl mx-auto p-6">
-      <h1 className="text-2xl font-semibold mb-6">Upload Video</h1>
+      <h1 className="text-2xl font-semibold mb-6">
+        {editVideo ? "Edit Video" : "Upload Video"}
+      </h1>
 
       <form onSubmit={handleUpload} className="flex flex-col gap-4">
         <input
@@ -138,7 +151,13 @@ function UploadVideo() {
           disabled={loading}
           className="bg-red-600 text-white py-2 rounded hover:bg-red-700"
         >
-          {loading ? "Uploading..." : "Upload Video"}
+          {loading
+            ? editVideo
+              ? "Updating..."
+              : "Uploading..."
+            : editVideo
+              ? "Update Video"
+              : "Upload Video"}
         </button>
       </form>
     </div>

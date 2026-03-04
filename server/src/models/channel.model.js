@@ -7,18 +7,32 @@ const channelSchema = new mongoose.Schema(
       required: true,
       trim: true,
     },
+
     description: {
       type: String,
       default: "",
     },
+
     banner: {
       type: String,
       default: "",
     },
-    subscribers: {
-      type: Number,
-      default: 0,
+
+    // avatar
+    avatar: {
+      type: String,
+      default: "",
     },
+
+    // subscribers list
+    subscribers: [
+      {
+        type: mongoose.Schema.Types.ObjectId,
+        ref: "User",
+      },
+    ],
+
+    // channel owner
     owner: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",

@@ -8,17 +8,46 @@ import { CgProfile } from "react-icons/cg";
 import { MdOutlineLogout } from "react-icons/md";
 import { FaGoogle } from "react-icons/fa";
 import { LuMenu } from "react-icons/lu";
+import { useAuth } from "../context/AuthContext";
 import YouTubeLogo from "../assets/YouTube_Logo.svg";
 
-function Header({ authUser, setAuthUser, sidebarOpen, setSidebarOpen }) {
+import api from "../services/api";
+
+function Header({ sidebarOpen, setSidebarOpen }) {
   const navigate = useNavigate();
+
+  const { authUser, logout } = useAuth();
+
   const [openMenu, setOpenMenu] = useState(false);
+  const [searchTerm, setSearchTerm] = useState("");
+
   const menuRef = useRef();
 
   const handleLogout = () => {
-    localStorage.clear();
-    setAuthUser(null);
+    logout();
     navigate("/");
+  };
+
+  const handleSearch = () => {
+    if (!searchTerm.trim()) return;
+    navigate(`/search?q=${searchTerm}`);
+  };
+
+  const handleCreate = async () => {
+    try {
+      const res = await api.get("/my-channel");
+
+      if (!res.data || !res.data._id) {
+        alert("You need to create a channel before uploading videos.");
+
+        navigate("/create-channel");
+        return;
+      }
+
+      navigate("/upload");
+    } catch (err) {
+      navigate("/create-channel");
+    }
   };
 
   // Close dropdown when clicking outside
@@ -28,16 +57,18 @@ function Header({ authUser, setAuthUser, sidebarOpen, setSidebarOpen }) {
         setOpenMenu(false);
       }
     };
+
     document.addEventListener("mousedown", handleClickOutside);
+
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
   return (
-    <div className="w-full flex justify-between items-center px-4 py-2  bg-white sticky top-0 z-50">
+    <div className="w-full flex justify-between items-center px-4 py-2 bg-white sticky top-0 z-50">
       {/* LEFT */}
       <div className="flex items-center gap-4">
         <button
-          onClick={() => setSidebarOpen(!sidebarOpen)}
+          onClick={() => setSidebarOpen((prev) => !prev)}
           className="text-xl hover:bg-gray-200 p-2 rounded-full transition"
         >
           <LuMenu />
@@ -56,11 +87,19 @@ function Header({ authUser, setAuthUser, sidebarOpen, setSidebarOpen }) {
         <input
           type="text"
           placeholder="Search"
+          value={searchTerm}
+          onChange={(e) => setSearchTerm(e.target.value)}
+          onKeyDown={(e) => e.key === "Enter" && handleSearch()}
           className="w-full border border-gray-300 rounded-l-full px-4 py-[7px] text-sm outline-none bg-white focus:border-blue-500 focus:shadow-[inset_0_0_0_1px_#1c62b9] transition-all"
         />
-        <button className="border border-gray-300 border-l-0 rounded-r-full px-5 py-2 bg-gray-100 hover:bg-gray-200 text-lg">
+
+        <button
+          onClick={handleSearch}
+          className="border border-gray-300 border-l-0 rounded-r-full px-5 py-2 bg-gray-100 hover:bg-gray-200 text-lg"
+        >
           <CiSearch />
         </button>
+
         <button className="rounded-full p-2 bg-gray-100 text-xl ml-4 hover:bg-gray-200 transition">
           <BiMicrophone />
         </button>
@@ -78,7 +117,10 @@ function Header({ authUser, setAuthUser, sidebarOpen, setSidebarOpen }) {
           </button>
         ) : (
           <>
-            <button className="flex items-center gap-2 px-4 py-1 bg-gray-100 rounded-full hover:bg-gray-200 transition">
+            <button
+              onClick={handleCreate}
+              className="flex items-center gap-2 px-4 py-1 bg-gray-100 rounded-full hover:bg-gray-200 transition"
+            >
               <FiPlus />
               <span className="text-sm font-medium">Create</span>
             </button>
@@ -103,20 +145,32 @@ function Header({ authUser, setAuthUser, sidebarOpen, setSidebarOpen }) {
               {openMenu && (
                 <div className="absolute right-0 mt-3 w-64 bg-white shadow-lg rounded-lg py-2 z-50">
                   <div className="px-4 py-3 border-b border-gray-300">
-                    <div className="flex space-between item-center gap-2">
-                      <div
-                        onClick={() => setOpenMenu(!openMenu)}
-                        className="w-8 h-8 bg-gray-500 rounded-full flex items-center justify-center text-white text-sm font-semibold cursor-pointer"
-                      >
+                    <div className="flex gap-2">
+                      <div className="w-8 h-8 bg-gray-500 rounded-full flex items-center justify-center text-white text-sm font-semibold">
                         {authUser?.charAt(0).toUpperCase()}
                       </div>
+
                       <div className="leading-none">
                         <p className="text-sm">{authUser}</p>
                         <p className="text-xs text-gray-500">
                           @{authUser.toLowerCase()}
                         </p>
+
                         <button
-                          onClick={() => navigate("/channel")}
+                          onClick={async () => {
+                            try {
+                              const res = await api.get("/my-channel");
+
+                              if (!res.data || !res.data._id) {
+                                navigate("/create-channel");
+                                return;
+                              }
+
+                              navigate(`/channel/${res.data._id}`);
+                            } catch {
+                              navigate("/create-channel");
+                            }
+                          }}
                           className="text-blue-600 text-xs mt-2 cursor-pointer"
                         >
                           View your channel

@@ -6,6 +6,7 @@ const videoRoutes = require("./routes/video.routes");
 const channelRoutes = require("./routes/channel.routes");
 const commentRoutes = require("./routes/comment.routes");
 const cors = require("cors");
+const reactionRoutes = require("./routes/reaction.routes");
 require("dotenv").config();
 
 const app = express();
@@ -33,5 +34,6 @@ userRoutes(app);
 videoRoutes(app);
 channelRoutes(app);
 commentRoutes(app);
+reactionRoutes(app);
 
 module.exports = app;

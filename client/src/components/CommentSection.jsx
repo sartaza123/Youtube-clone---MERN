@@ -1,77 +1,76 @@
 import { useEffect, useState } from "react";
-import api from "../services/api";
+import API from "../services/api";
+import { useAuth } from "../context/AuthContext";
 
-function CommentSection({ videoId, currentUser }) {
+function CommentSection({ videoId }) {
+  const { authUser, userId } = useAuth();
+
   const [comments, setComments] = useState([]);
   const [newComment, setNewComment] = useState("");
   const [editingId, setEditingId] = useState(null);
   const [editText, setEditText] = useState("");
 
-  /* ================= FETCH COMMENTS ================= */
   const fetchComments = async () => {
     try {
-      const res = await api.get(`/comments/${videoId}`);
-      setComments(res.data);
-    } catch (error) {
+      const res = await API.get(`/comments/${videoId}`);
+      setComments(res.data || []);
+    } catch {
       console.log("Error loading comments");
     }
   };
 
   useEffect(() => {
-    fetchComments();
+    if (videoId) fetchComments();
   }, [videoId]);
 
-  /* ================= ADD COMMENT ================= */
   const handleAddComment = async () => {
     if (!newComment.trim()) return;
 
     try {
-      await api.post("/comments", {
+      await API.post("/comments", {
         text: newComment,
-        videoId: videoId,
+        video: videoId,
       });
 
       setNewComment("");
       fetchComments();
     } catch (error) {
-      console.log("Login required");
+      console.log(error);
     }
   };
 
-  /* ================= UPDATE COMMENT ================= */
   const handleUpdate = async (id) => {
+    if (!editText.trim()) return;
+
     try {
-      await api.put(`/comments/${id}`, {
-        text: editText,
-      });
+      await API.put(`/comments/${id}`, { text: editText });
 
       setEditingId(null);
+      setEditText("");
       fetchComments();
-    } catch (error) {
+    } catch {
       console.log("Update failed");
     }
   };
 
-  /* ================= DELETE COMMENT ================= */
   const handleDelete = async (id) => {
     try {
-      await api.delete(`/comments/${id}`);
+      await API.delete(`/comments/${id}`);
       fetchComments();
-    } catch (error) {
+    } catch {
       console.log("Delete failed");
     }
   };
 
   return (
     <div className="mt-8">
-      {/* Comment Count */}
       <h2 className="text-lg font-semibold mb-6">{comments.length} Comments</h2>
 
-      {/* Add Comment */}
-      {currentUser && (
+      {/* ADD COMMENT */}
+      {authUser && (
         <div className="flex gap-4 mb-8">
           <div className="w-10 h-10 bg-gray-500 rounded-full flex items-center justify-center text-white font-semibold">
-            {currentUser.charAt(0).toUpperCase()}
+            {authUser.charAt(0).toUpperCase()}
           </div>
 
           <div className="flex-1">
@@ -80,7 +79,7 @@ function CommentSection({ videoId, currentUser }) {
               placeholder="Add a comment..."
               value={newComment}
               onChange={(e) => setNewComment(e.target.value)}
-              className="w-full border-b border-gray-300 focus:border-black outline-none py-2"
+              className="w-full border-b border-gray-300 outline-none py-2"
             />
 
             <div className="flex justify-end gap-4 mt-2">
@@ -102,62 +101,66 @@ function CommentSection({ videoId, currentUser }) {
         </div>
       )}
 
-      {/* Comment List */}
-      <div className="space-y-6">
-        {comments.map((comment) => (
-          <div key={comment._id} className="flex gap-4">
-            <div className="w-10 h-10 bg-gray-500 rounded-full flex items-center justify-center text-white font-semibold">
-              {comment.user.username.charAt(0).toUpperCase()}
-            </div>
+      {!authUser && <p className="text-sm text-gray-500">Login to comment</p>}
 
-            <div className="flex-1">
-              <div className="flex items-center gap-2 text-sm">
-                <span className="font-semibold">{comment.user.username}</span>
+      {/* COMMENTS */}
+      <div className="space-y-6">
+        {comments.map((comment) => {
+          const username = comment.user?.username || "User";
+          const isOwner = comment.user?._id === userId;
+
+          return (
+            <div key={comment._id} className="flex gap-4">
+              <div className="w-10 h-10 bg-gray-500 rounded-full flex items-center justify-center text-white font-semibold">
+                {username.charAt(0).toUpperCase()}
               </div>
 
-              {editingId === comment._id ? (
-                <>
-                  <input
-                    value={editText}
-                    onChange={(e) => setEditText(e.target.value)}
-                    className="w-full border-b border-gray-300 outline-none py-1 mt-1"
-                  />
+              <div className="flex-1">
+                <span className="font-semibold text-sm">{username}</span>
 
-                  <div className="flex gap-4 mt-2 text-sm">
-                    <button onClick={() => setEditingId(null)}>Cancel</button>
+                {editingId === comment._id ? (
+                  <>
+                    <input
+                      value={editText}
+                      onChange={(e) => setEditText(e.target.value)}
+                      className="w-full border-b outline-none py-1 mt-1"
+                    />
 
+                    <div className="flex gap-4 mt-2 text-sm">
+                      <button onClick={() => setEditingId(null)}>Cancel</button>
+
+                      <button
+                        onClick={() => handleUpdate(comment._id)}
+                        className="bg-black text-white px-4 py-1 rounded-full"
+                      >
+                        Save
+                      </button>
+                    </div>
+                  </>
+                ) : (
+                  <p className="text-sm mt-1">{comment.text}</p>
+                )}
+
+                {isOwner && editingId !== comment._id && (
+                  <div className="flex gap-4 mt-2 text-xs text-gray-600">
                     <button
-                      onClick={() => handleUpdate(comment._id)}
-                      className="bg-black text-white px-4 py-1 rounded-full"
+                      onClick={() => {
+                        setEditingId(comment._id);
+                        setEditText(comment.text);
+                      }}
                     >
-                      Save
+                      Edit
+                    </button>
+
+                    <button onClick={() => handleDelete(comment._id)}>
+                      Delete
                     </button>
                   </div>
-                </>
-              ) : (
-                <p className="text-sm mt-1">{comment.text}</p>
-              )}
-
-              {/* Edit/Delete Only for Owner */}
-              {currentUser && comment.user.username === currentUser && (
-                <div className="flex gap-4 mt-2 text-xs text-gray-600">
-                  <button
-                    onClick={() => {
-                      setEditingId(comment._id);
-                      setEditText(comment.text);
-                    }}
-                  >
-                    Edit
-                  </button>
-
-                  <button onClick={() => handleDelete(comment._id)}>
-                    Delete
-                  </button>
-                </div>
-              )}
+                )}
+              </div>
             </div>
-          </div>
-        ))}
+          );
+        })}
       </div>
     </div>
   );

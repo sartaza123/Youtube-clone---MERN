@@ -8,14 +8,11 @@ function CreateChannel() {
   const [formData, setFormData] = useState({
     channelName: "",
     description: "",
-    banner: "",
     avatar: "",
   });
 
+  const [preview, setPreview] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState("");
-
-  const { channelName, description, banner, avatar } = formData;
 
   const handleChange = (e) => {
     setFormData((prev) => ({
@@ -24,109 +21,137 @@ function CreateChannel() {
     }));
   };
 
+  // Avatar Upload
+  const handleImage = (e) => {
+    const file = e.target.files[0];
+
+    if (!file) return;
+
+    const imageUrl = URL.createObjectURL(file);
+
+    setPreview(imageUrl);
+
+    // For now we store preview url (since backend expects URL)
+    setFormData((prev) => ({
+      ...prev,
+      avatar: imageUrl,
+    }));
+  };
+
   const handleSubmit = async (e) => {
     e.preventDefault();
 
-    if (!channelName.trim()) {
-      return setError("Channel name is required");
+    if (!formData.channelName.trim()) {
+      alert("Channel name is required");
+      return;
+    }
+
+    if (!formData.description.trim()) {
+      alert("Description is required");
+      return;
     }
 
     try {
       setLoading(true);
-      setError("");
 
-      const avatarUrl =
-        avatar ||
-        `https://ui-avatars.com/api/?name=${encodeURIComponent(
-          channelName,
-        )}&background=random&color=fff`;
-
-      const { data } = await api.post("/channels", {
-        channelName: channelName.trim(),
-        description,
-        banner,
-        avatar: avatarUrl,
-      });
+      const { data } = await api.post("/channels", formData);
 
       navigate(`/channel/${data._id}`);
-    } catch (err) {
-      setError(err.response?.data?.message || "Failed to create channel");
+    } catch (error) {
+      console.error(error);
+      alert(error.response?.data?.message || "Failed to create channel");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="max-w-xl mx-auto mt-12 p-6 bg-white shadow rounded-xl">
-      <h2 className="text-2xl font-bold mb-6">Create Your Channel</h2>
+    <div className="flex justify-center items-center min-h-[85vh] bg-gray-100">
+      <div className="bg-white w-full max-w-lg rounded-xl shadow-lg p-8">
+        <h2 className="text-xl font-semibold mb-6 text-center">
+          How you'll appear
+        </h2>
 
-      {error && (
-        <div className="mb-4 text-red-500 text-sm font-medium">{error}</div>
-      )}
+        {/* Avatar Upload */}
+        <div className="flex flex-col items-center mb-6">
+          <label className="cursor-pointer">
+            <div className="w-28 h-28 rounded-full bg-gray-200 overflow-hidden flex items-center justify-center">
+              {preview ? (
+                <img
+                  src={preview}
+                  alt="avatar"
+                  className="w-full h-full object-cover"
+                />
+              ) : (
+                <span className="text-gray-500 text-sm">Select picture</span>
+              )}
+            </div>
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {/* Channel Name */}
-        <div>
-          <label className="block text-sm font-medium mb-1">Channel Name</label>
-          <input
-            type="text"
-            name="channelName"
-            value={channelName}
-            onChange={handleChange}
-            required
-            className="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-black"
-          />
-        </div>
-
-        {/* Description */}
-        <div>
-          <label className="block text-sm font-medium mb-1">Description</label>
-          <textarea
-            name="description"
-            value={description}
-            onChange={handleChange}
-            rows={4}
-            className="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-black"
-          />
-        </div>
-
-        {/* Avatar URL */}
-        <div>
-          <label className="block text-sm font-medium mb-1">
-            Avatar Image URL (optional)
+            <input
+              type="file"
+              accept="image/*"
+              onChange={handleImage}
+              className="hidden"
+            />
           </label>
-          <input
-            type="text"
-            name="avatar"
-            value={avatar}
-            onChange={handleChange}
-            className="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-black"
-          />
+
+          <p className="text-blue-600 text-sm mt-2 cursor-pointer">
+            Select picture
+          </p>
         </div>
 
-        {/* Banner URL */}
-        <div>
-          <label className="block text-sm font-medium mb-1">
-            Banner Image URL
-          </label>
-          <input
-            type="text"
-            name="banner"
-            value={banner}
-            onChange={handleChange}
-            className="w-full border px-3 py-2 rounded-lg outline-none focus:ring-2 focus:ring-black"
-          />
-        </div>
+        {/* FORM */}
+        <form onSubmit={handleSubmit} className="space-y-4">
+          {/* Channel Name */}
+          <div>
+            <label className="text-sm text-gray-600">Name</label>
 
-        {/* Submit Button */}
-        <button
-          type="submit"
-          disabled={loading}
-          className="w-full bg-black text-white py-2 rounded-lg hover:bg-gray-800 transition disabled:opacity-60"
-        >
-          {loading ? "Creating..." : "Create Channel"}
-        </button>
-      </form>
+            <input
+              type="text"
+              name="channelName"
+              value={formData.channelName}
+              onChange={handleChange}
+              placeholder="Enter channel name"
+              required
+              className="w-full border rounded-md p-3 mt-1 focus:outline-none focus:border-blue-500"
+            />
+          </div>
+
+          {/* Description */}
+          <div>
+            <label className="text-sm text-gray-600">Description</label>
+
+            <textarea
+              name="description"
+              value={formData.description}
+              onChange={handleChange}
+              placeholder="Tell viewers about your channel"
+              rows={3}
+              required
+              className="w-full border rounded-md p-3 mt-1 focus:outline-none focus:border-blue-500"
+            />
+          </div>
+
+          {/* Buttons */}
+          <div className="flex justify-end gap-3 pt-4">
+            <button
+              type="button"
+              onClick={() => navigate("/")}
+              className="px-4 py-2 text-gray-600 hover:bg-gray-100 rounded-md"
+            >
+              Cancel
+            </button>
+
+            <button
+              type="submit"
+              disabled={loading}
+              className="px-4 py-2 bg-blue-600 text-white rounded-md hover:bg-blue-700"
+            >
+              {loading ? "Creating..." : "Create channel"}
+            </button>
+          </div>
+        </form>
+      </div>
     </div>
   );
 }

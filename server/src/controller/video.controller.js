@@ -7,7 +7,6 @@ async function createVideo(req, res) {
     const { title, description, thumbnailUrl, videoUrl, category, channel } =
       req.body;
 
-    // Check if channel exists and belongs to logged-in user
     const channelData = await channelModel.findById(channel);
 
     if (!channelData) {
@@ -48,7 +47,24 @@ async function getAllVideos(req, res) {
       filter.category = category;
     }
 
-    const videos = await videoModel.find(filter).populate("channel");
+    const videos = await videoModel
+      .find(filter)
+      .populate("channel")
+      .sort({ createdAt: -1 });
+
+    res.status(200).json(videos);
+  } catch (error) {
+    res.status(500).json({ message: "Server error" });
+  }
+}
+
+// ================= GET VIDEOS BY CHANNEL =================
+async function getVideosByChannel(req, res) {
+  try {
+    const videos = await videoModel
+      .find({ channel: req.params.channelId })
+      .populate("channel")
+      .sort({ createdAt: -1 });
 
     res.status(200).json(videos);
   } catch (error) {
@@ -80,7 +96,6 @@ async function updateVideo(req, res) {
       return res.status(404).json({ message: "Video not found" });
     }
 
-    // Ownership check
     if (video.channel.owner.toString() !== req.user.id) {
       return res.status(403).json({ message: "Not authorized" });
     }
@@ -106,7 +121,6 @@ async function deleteVideo(req, res) {
       return res.status(404).json({ message: "Video not found" });
     }
 
-    // Ownership check
     if (video.channel.owner.toString() !== req.user.id) {
       return res.status(403).json({ message: "Not authorized" });
     }
@@ -125,4 +139,5 @@ module.exports = {
   getVideoById,
   updateVideo,
   deleteVideo,
+  getVideosByChannel,
 };

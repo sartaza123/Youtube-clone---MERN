@@ -1,15 +1,21 @@
 const authMiddleware = require("../middleware/auth.middleware");
+
 const {
   createVideo,
   getAllVideos,
   getVideoById,
   updateVideo,
   deleteVideo,
+  getVideosByChannel,
 } = require("../controller/video.controller");
 
 function videoRoutes(app) {
   // Public Routes
   app.get("/api/videos", getAllVideos);
+
+  // 🔹 Fetch videos by channel
+  app.get("/api/videos/channel/:channelId", getVideosByChannel);
+
   app.get("/api/videos/:id", getVideoById);
 
   // Protected Routes

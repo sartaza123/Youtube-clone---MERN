@@ -15,7 +15,6 @@ const hoverColors = [
 function VideoCard({ video }) {
   const navigate = useNavigate();
 
-  /* Random Hover Color */
   const hoverColor =
     hoverColors[Math.floor(Math.random() * hoverColors.length)];
 
@@ -34,8 +33,13 @@ function VideoCard({ video }) {
 
   /* Time ago */
   const timeAgo = (date) => {
+    if (!date) return "";
+
     const now = new Date();
     const uploaded = new Date(date);
+
+    if (isNaN(uploaded)) return "";
+
     const diff = Math.floor((now - uploaded) / 1000);
 
     const minutes = Math.floor(diff / 60);
@@ -50,15 +54,25 @@ function VideoCard({ video }) {
     return `${months} months ago`;
   };
 
+  /* Safe values */
+  const videoId = video._id || video.videoId;
+  const thumbnail = video.thumbnailUrl || video.thumbnail;
+  const channelName =
+    video.channel?.channelName || video.channelName || "Unknown Channel";
+
+  const avatar =
+    video.channel?.avatar ||
+    `https://ui-avatars.com/api/?name=${encodeURIComponent(channelName)}`;
+
   return (
     <div
-      onClick={() => navigate(`/video/${video._id}`)}
+      onClick={() => navigate(`/video/${videoId}`)}
       className={`cursor-pointer rounded-xl p-2 transition-all duration-300 group ${hoverColor}`}
     >
-      {/* Thumbnail */}
+      {/* Thumbnail */}{" "}
       <div className="relative">
         <img
-          src={video.thumbnailUrl || "/default-thumbnail.jpg"}
+          src={thumbnail || "/default-thumbnail.jpg"}
           alt={video.title}
           className="w-full rounded-xl object-cover aspect-video"
           onError={(e) => {
@@ -66,19 +80,17 @@ function VideoCard({ video }) {
           }}
         />
 
-        {/* Duration Badge (optional) */}
         {video.duration && (
           <span className="absolute bottom-2 right-2 text-xs bg-black text-white px-1.5 py-0.5 rounded">
             {video.duration}
           </span>
         )}
       </div>
-
       {/* Info Section */}
       <div className="flex gap-3 mt-3">
         {/* Avatar */}
         <img
-          src={video.channel?.avatar}
+          src={avatar}
           alt="avatar"
           className="w-9 h-9 rounded-full object-cover"
         />
@@ -98,9 +110,7 @@ function VideoCard({ video }) {
           </h3>
 
           {/* Channel */}
-          <p className="text-xs text-gray-600 mt-1">
-            {video.channel?.channelName || "Unknown Channel"}
-          </p>
+          <p className="text-xs text-gray-600 mt-1">{channelName}</p>
 
           {/* Views + Time */}
           <p className="text-xs text-gray-500">
@@ -108,7 +118,6 @@ function VideoCard({ video }) {
           </p>
         </div>
 
-        {/* Menu Icon */}
         <BsThreeDotsVertical className="text-gray-600 mt-1 opacity-0 group-hover:opacity-100 transition" />
       </div>
     </div>

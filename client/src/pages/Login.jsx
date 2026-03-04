@@ -1,12 +1,12 @@
 import { useState } from "react";
-import { useNavigate, useOutletContext } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import API from "../services/api";
 import YouTubeLogo from "../assets/YouTube_Logo.svg";
+import { useAuth } from "../context/AuthContext";
 
 function Login() {
   const navigate = useNavigate();
-  const outletContext = useOutletContext();
-  const setAuthUser = outletContext?.setAuthUser;
+  const { login } = useAuth();
 
   const [formData, setFormData] = useState({
     email: "",
@@ -31,16 +31,13 @@ function Login() {
     try {
       const { data } = await API.post("/auth/login", formData);
 
-      // Save token & username
-      localStorage.setItem("token", data.token);
-      localStorage.setItem("username", data.username);
+      login({
+        token: data.token,
+        username: data.user.username,
+        userId: data.user.id,
+      });
 
-      // Update Header state instantly
-      if (setAuthUser) {
-        setAuthUser(data.username);
-      }
-
-      navigate("/");
+      navigate("/", { replace: true });
     } catch (err) {
       setError(err.response?.data?.message || "Invalid email or password");
     } finally {
@@ -51,7 +48,6 @@ function Login() {
   return (
     <div className="flex justify-center items-center min-h-screen bg-gray-100">
       <div className="bg-white w-full max-w-sm p-8 rounded-lg shadow-md">
-        {/* Logo */}
         <div className="flex justify-center mb-6">
           <img src={YouTubeLogo} alt="logo" className="h-6" />
         </div>

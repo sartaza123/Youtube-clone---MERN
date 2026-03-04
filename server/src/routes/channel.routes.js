@@ -8,10 +8,10 @@ const {
 } = require("../controller/channel.controller");
 
 function channelRoutes(app) {
-  // Public
+  // Public routes
   app.get("/api/channels/:id", getChannelById);
 
-  // Protected
+  // Protected routes
   app.post("/api/channels", authMiddleware, createChannel);
   app.get("/api/my-channel", authMiddleware, getMyChannel);
   app.put("/api/channels/:id", authMiddleware, updateChannel);

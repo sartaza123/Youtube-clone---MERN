@@ -1,30 +1,35 @@
 import { useRef, useState, useEffect } from "react";
 import { FiChevronLeft, FiChevronRight } from "react-icons/fi";
+import API from "../services/api";
 
-const filters = [
-  "All",
-  "Music",
-  "JavaScript",
-  "Trailers",
-  "Mixes",
-  "Marvel Studios",
-  "Web series",
-  "Action Thrillers",
-  "Satire",
-  "Dramedy",
-  "Live",
-  "Algorithms",
-  "Animated films",
-  "Vocal Music",
-  "Lectures",
-  "Recently uploaded",
-];
-
-function FilterBar() {
+function FilterBar({ onFilterChange }) {
   const scrollRef = useRef(null);
+
   const [showLeft, setShowLeft] = useState(false);
   const [showRight, setShowRight] = useState(true);
+
+  const [filters, setFilters] = useState(["All"]);
   const [active, setActive] = useState("All");
+
+  // GET CATEGORIES FROM VIDEOS
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        const { data } = await API.get("/videos");
+
+        const categories = [
+          "All",
+          ...new Set(data.map((video) => video.category).filter(Boolean)),
+        ];
+
+        setFilters(categories);
+      } catch (error) {
+        console.log(error);
+      }
+    };
+
+    fetchCategories();
+  }, []);
 
   const checkScroll = () => {
     const el = scrollRef.current;
@@ -36,7 +41,7 @@ function FilterBar() {
 
   useEffect(() => {
     checkScroll();
-  }, []);
+  }, [filters]);
 
   const scroll = (dir) => {
     const el = scrollRef.current;
@@ -50,8 +55,16 @@ function FilterBar() {
     setTimeout(checkScroll, 300);
   };
 
+  const handleFilterClick = (item) => {
+    setActive(item);
+
+    if (onFilterChange) {
+      onFilterChange(item);
+    }
+  };
+
   return (
-    <div className="relative bg-white">
+    <div className="sticky top-0 z-10 bg-white">
       {/* LEFT ARROW */}
       {showLeft && (
         <button
@@ -62,7 +75,7 @@ function FilterBar() {
         </button>
       )}
 
-      {/* SCROLL CONTAINER */}
+      {/* FILTER SCROLL */}
       <div
         ref={scrollRef}
         onScroll={checkScroll}
@@ -71,13 +84,13 @@ function FilterBar() {
         {filters.map((item) => (
           <button
             key={item}
-            onClick={() => setActive(item)}
+            onClick={() => handleFilterClick(item)}
             className={`px-2 py-1 rounded-md text-xs font-medium transition
-              ${
-                active === item
-                  ? "bg-black text-white"
-                  : "bg-gray-100 hover:bg-gray-200"
-              }`}
+            ${
+              active === item
+                ? "bg-black text-white"
+                : "bg-gray-100 hover:bg-gray-200"
+            }`}
           >
             {item}
           </button>
