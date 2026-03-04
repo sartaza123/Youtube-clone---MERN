@@ -3,8 +3,8 @@ server/node_modules/
 client/node_modules/
 
 # Environment files
-server/.env
-client/.env
+# server/.env
+# client/.env
 
 # Logs
 *.log
