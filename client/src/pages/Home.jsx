@@ -1,5 +1,5 @@
 import { useEffect, useState } from "react";
-import FilterBar from "../components/filterBar";
+import FilterBar from "../components/FilterBar";
 import VideoCard from "../components/VideoCard";
 import api from "../services/api";
 
