@@ -91,8 +91,6 @@ function Video() {
     }
   };
 
-  const visibleComments = showAllComments ? comments : comments.slice(0, 1);
-
   return (
     <div className="max-w-[1400px] mx-auto px-3 sm:px-6 py-4">
       <div className="flex flex-col lg:flex-row gap-6">
@@ -150,9 +148,10 @@ function Video() {
 
               <button
                 onClick={handleDislike}
-                className="px-4 py-2 rounded-full hover:bg-gray-200"
+                className="flex items-center gap-2 px-4 py-2 rounded-full hover:bg-gray-200"
               >
                 <BiDislike size={18} />
+                {video.dislikes?.length || 0}
               </button>
 
               <button className="px-4 py-2 bg-gray-100 rounded-full">
