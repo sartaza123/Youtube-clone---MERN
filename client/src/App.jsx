@@ -1,7 +1,7 @@
 import { useState } from "react";
 import { Outlet } from "react-router-dom";
 import Header from "./components/Header";
-import Sidebar from "./components/Sidebar";
+import Sidebar from "./components/SideBar";
 
 function App() {
   const [sidebarOpen, setSidebarOpen] = useState(true);
@@ -15,6 +15,12 @@ function App() {
       <div className="flex flex-1 overflow-hidden">
         {/* SIDEBAR */}
         <Sidebar sidebarOpen={sidebarOpen} />
+        {sidebarOpen && (
+          <div
+            className="fixed inset-0 bg-black/40 z-40 md:hidden"
+            onClick={() => setSidebarOpen(false)}
+          />
+        )}
 
         {/* MAIN */}
         <main className="flex-1 min-w-0 overflow-y-auto bg-gray-50">

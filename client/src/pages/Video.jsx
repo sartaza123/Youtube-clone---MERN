@@ -19,59 +19,51 @@ function Video() {
   const [suggestedVideos, setSuggestedVideos] = useState([]);
   const [showFullDescription, setShowFullDescription] = useState(false);
 
+  const [comments, setComments] = useState([]);
+  const [showAllComments, setShowAllComments] = useState(false);
+
   useEffect(() => {
     fetchVideo();
     fetchSuggestedVideos();
+    fetchComments();
   }, [id]);
-
-  /* ================= FETCH VIDEO ================= */
 
   const fetchVideo = async () => {
     try {
       const res = await API.get(`/videos/${id}`);
-
-      const videoData = res.data;
-
-      // Ensure arrays exist
-      videoData.likes = videoData.likes || [];
-      videoData.dislikes = videoData.dislikes || [];
-
-      setVideo(videoData);
+      setVideo(res.data);
     } catch (err) {
       console.error(err);
     }
   };
 
-  /* ================= FETCH SUGGESTED ================= */
-
   const fetchSuggestedVideos = async () => {
     try {
       const res = await API.get("/videos");
-
       const filtered = res.data.filter((v) => v._id !== id);
-
       setSuggestedVideos(filtered.slice(0, 15));
     } catch (err) {
       console.error(err);
     }
   };
 
-  /* ================= GET YOUTUBE ID ================= */
+  const fetchComments = async () => {
+    try {
+      const res = await API.get(`/comments/${id}`);
+      setComments(res.data || []);
+    } catch {
+      console.log("Error loading comments");
+    }
+  };
 
   const getYoutubeId = (url) => {
     const match = url.match(/(?:youtube\.com\/.*v=|youtu\.be\/)([^&?]+)/);
     return match ? match[1] : "";
   };
 
-  /* ================= LIKE VIDEO ================= */
+  if (!video) return <div className="p-6">Loading...</div>;
 
   const handleLike = async () => {
-    if (!authUser) {
-      alert("Please login to like videos");
-      navigate("/login");
-      return;
-    }
-
     try {
       const res = await API.put(`/videos/${video._id}/like`);
 
@@ -81,19 +73,11 @@ function Video() {
         dislikes: res.data.dislikes,
       }));
     } catch (err) {
-      console.error(err); // err handling
+      console.error(err);
     }
   };
 
-  /* ================= DISLIKE VIDEO ================= */
-
   const handleDislike = async () => {
-    if (!authUser) {
-      alert("Please login to dislike videos");
-      navigate("/login");
-      return;
-    }
-
     try {
       const res = await API.put(`/videos/${video._id}/dislike`);
 
@@ -107,14 +91,16 @@ function Video() {
     }
   };
 
-  if (!video) return <div className="p-6">Loading...</div>;
+  const visibleComments = showAllComments ? comments : comments.slice(0, 1);
 
   return (
-    <div className="max-w-[1400px] mx-auto px-6 py-4">
+    <div className="max-w-[1400px] mx-auto px-3 sm:px-6 py-4">
       <div className="flex flex-col lg:flex-row gap-6">
-        {/* LEFT SIDE */}
+        {/* VIDEO SECTION */}
+
         <div className="flex-1 lg:w-[70%]">
-          {/* VIDEO PLAYER */}
+          {/* PLAYER */}
+
           <div className="w-full aspect-video">
             <iframe
               className="w-full h-full rounded-xl"
@@ -124,71 +110,67 @@ function Video() {
           </div>
 
           {/* TITLE */}
-          <h1 className="text-xl font-semibold mt-4">{video.title}</h1>
+
+          <h1 className="text-lg sm:text-xl font-semibold mt-4">
+            {video.title}
+          </h1>
 
           {/* CHANNEL + ACTIONS */}
-          <div className="flex justify-between items-center mt-4">
+
+          <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mt-4">
             {/* CHANNEL */}
+
             <div className="flex items-center gap-4">
               <img
                 src={video.channel?.avatar || "/default-avatar.png"}
-                className="w-10 h-10 rounded-full"
+                className="w-9 h-9 sm:w-10 sm:h-10 rounded-full"
               />
 
               <div>
-                <p className="font-semibold text-sm">
+                <p className="font-semibold text-xs md:text-sm">
                   {video.channel?.channelName}
                 </p>
               </div>
 
-              <button className="bg-black text-white px-4 py-2 rounded-full text-sm">
+              <button className="bg-black text-white px-4 py-2 rounded-full text-xs md:text-sm">
                 Subscribe
               </button>
             </div>
 
-            {/* ACTION BUTTONS */}
-            <div className="flex items-center gap-3 text-sm">
-              {/* LIKE DISLIKE GROUP */}
-              <div className="flex items-center bg-gray-100 rounded-full overflow-hidden">
-                <button
-                  onClick={handleLike}
-                  className="flex items-center gap-2 px-4 py-2 hover:bg-gray-200"
-                >
-                  <BiLike size={18} />
-                  {video.likes.length || 0}
-                </button>
+            {/* ACTIONS */}
 
-                <div className="h-6 w-[1px] bg-gray-300" />
-
-                <button
-                  onClick={handleDislike}
-                  className="flex items-center gap-2 px-4 py-2 hover:bg-gray-200"
-                >
-                  <BiDislike size={18} />
-                  {video.dislikes.length || 0}
-                </button>
-              </div>
-
-              {/* SHARE */}
-              <button className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-full hover:bg-gray-200">
-                <FiShare size={18} />
-                Share
+            <div className="flex items-center gap-2 flex-wrap">
+              <button
+                onClick={handleLike}
+                className="flex items-center gap-2 px-4 py-2 rounded-full hover:bg-gray-200"
+              >
+                <BiLike size={18} />
+                {video.likes?.length || 0}
               </button>
 
-              {/* SAVE */}
-              <button className="flex items-center gap-2 px-4 py-2 bg-gray-100 rounded-full hover:bg-gray-200">
-                <RiPlayListAddLine size={18} />
-                Save
+              <button
+                onClick={handleDislike}
+                className="px-4 py-2 rounded-full hover:bg-gray-200"
+              >
+                <BiDislike size={18} />
               </button>
 
-              {/* MORE */}
-              <button className="p-2 bg-gray-100 rounded-full hover:bg-gray-200">
-                <BsThreeDots size={18} />
+              <button className="px-4 py-2 bg-gray-100 rounded-full">
+                <FiShare />
+              </button>
+
+              <button className="px-4 py-2 bg-gray-100 rounded-full">
+                <RiPlayListAddLine />
+              </button>
+
+              <button className="p-2 bg-gray-100 rounded-full">
+                <BsThreeDots />
               </button>
             </div>
           </div>
 
           {/* DESCRIPTION */}
+
           <div
             onClick={() => setShowFullDescription(!showFullDescription)}
             className="mt-6 bg-gray-100 p-4 rounded-xl text-sm cursor-pointer"
@@ -203,20 +185,20 @@ function Video() {
               {video.description}
             </p>
           </div>
-
-          {/* COMMENTS */}
+          {/* FULL COMMENT SECTION */}
           <div className="mt-8">
             <CommentSection videoId={video._id} />
           </div>
         </div>
 
-        {/* RIGHT SIDE (SUGGESTED VIDEOS) */}
+        {/* SUGGESTED VIDEOS */}
+
         <div className="lg:w-[30%] space-y-4">
           {suggestedVideos.map((item) => (
             <div
               key={item._id}
               onClick={() => navigate(`/video/${item._id}`)}
-              className="flex gap-3 cursor-pointer group"
+              className="flex gap-3 cursor-pointer"
             >
               <img
                 src={item.thumbnailUrl}
@@ -224,19 +206,11 @@ function Video() {
               />
 
               <div>
-                <h3
-                  className="text-sm font-medium group-hover:text-blue-600"
-                  style={{
-                    display: "-webkit-box",
-                    WebkitLineClamp: 2,
-                    WebkitBoxOrient: "vertical",
-                    overflow: "hidden",
-                  }}
-                >
+                <h3 className="text-sm font-medium line-clamp-2">
                   {item.title}
                 </h3>
 
-                <p className="text-xs text-gray-600 mt-1">
+                <p className="text-xs text-gray-600">
                   {item.channel?.channelName}
                 </p>
               </div>

@@ -30,7 +30,6 @@ function Channel() {
   useEffect(() => {
     const fetchChannel = async () => {
       try {
-        // if id missing redirect immediately
         if (!id) {
           setLoading(false);
           navigate("/create-channel");
@@ -137,7 +136,6 @@ function Channel() {
 
     try {
       await api.delete(`/videos/${videoId}`);
-
       setVideos((prev) => prev.filter((v) => v._id !== videoId));
     } catch (err) {
       console.error("Delete failed:", err);
@@ -157,8 +155,9 @@ function Channel() {
   return (
     <div className="max-w-[1400px] mx-auto">
       {/* Banner */}
+
       {channel.banner && (
-        <div className="w-full h-44 overflow-hidden">
+        <div className="w-full h-32 sm:h-40 md:h-48 overflow-hidden">
           <img
             src={channel.banner}
             alt="banner"
@@ -168,14 +167,19 @@ function Channel() {
       )}
 
       {/* Header */}
-      <div className="px-6 py-6 flex gap-6 items-start">
-        <div className="w-28 h-28 rounded-full overflow-hidden bg-gray-200">
+
+      <div className="px-4 sm:px-6 py-6 flex flex-col sm:flex-row gap-5">
+        {/* Avatar */}
+
+        <div className="w-20 h-20 sm:w-28 sm:h-28 rounded-full overflow-hidden bg-gray-200 flex-shrink-0">
           <img
             src={avatarUrl}
             alt="channel avatar"
             className="w-full h-full object-cover"
           />
         </div>
+
+        {/* Channel Info */}
 
         <div className="flex-1">
           {editing ? (
@@ -219,7 +223,9 @@ function Channel() {
             </form>
           ) : (
             <>
-              <h1 className="text-2xl font-bold">{channel.channelName}</h1>
+              <h1 className="text-xl sm:text-2xl font-bold">
+                {channel.channelName}
+              </h1>
 
               <p className="text-sm text-gray-600 mt-1">
                 @{channel.channelName.replace(/\s+/g, "_")} ·{" "}
@@ -231,7 +237,7 @@ function Channel() {
                 {channel.description}
               </p>
 
-              <div className="flex gap-3 mt-4">
+              <div className="flex flex-wrap gap-3 mt-4">
                 {isOwner ? (
                   <>
                     <button
@@ -263,12 +269,13 @@ function Channel() {
       </div>
 
       {/* Tabs */}
-      <div className="border-b px-6 flex gap-6 text-sm font-medium">
+
+      <div className="border-b px-4 sm:px-6 flex gap-6 text-sm font-medium overflow-x-auto">
         {["home", "videos", "shorts", "posts"].map((tab) => (
           <button
             key={tab}
             onClick={() => setActiveTab(tab)}
-            className={`pb-3 capitalize ${
+            className={`pb-3 capitalize whitespace-nowrap ${
               activeTab === tab ? "border-b-2 border-black" : "text-gray-500"
             }`}
           >
@@ -278,12 +285,12 @@ function Channel() {
       </div>
 
       {/* Videos */}
-      <div className="px-6 py-8">
+
+      <div className="px-4 sm:px-6 py-8">
         {(activeTab === "home" || activeTab === "videos") && (
           <div className="grid gap-6 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             {videos.map((video) => (
               <div key={video._id} className="relative">
-                {/* VIDEO CARD */}
                 <VideoCard
                   video={{
                     videoId: video._id,
@@ -295,9 +302,8 @@ function Channel() {
                   }}
                 />
 
-                {/* OWNER MENU */}
                 {isOwner && (
-                  <div className="absolute top-35 right-2">
+                  <div className="absolute top-2 right-2">
                     <button
                       onClick={() =>
                         setOpenMenu(openMenu === video._id ? null : video._id)

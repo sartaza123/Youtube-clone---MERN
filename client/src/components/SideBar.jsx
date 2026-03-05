@@ -14,10 +14,11 @@ import { IoMdHelpCircleOutline } from "react-icons/io";
 import { LuChevronDown } from "react-icons/lu";
 import { useNavigate } from "react-router-dom";
 
-function Sidebar({ sidebarOpen }) {
+function Sidebar({ sidebarOpen, setSidebarOpen }) {
   const navigate = useNavigate();
 
   /* ================= MINI COLLAPSED ITEM ================= */
+
   function MiniItem({ icon, label, to }) {
     return (
       <div
@@ -31,6 +32,7 @@ function Sidebar({ sidebarOpen }) {
   }
 
   /* ================= FULL SIDEBAR ITEM ================= */
+
   function SidebarItem({ icon, text, to }) {
     return (
       <div
@@ -44,6 +46,7 @@ function Sidebar({ sidebarOpen }) {
   }
 
   /* ================= SECTION TITLE ================= */
+
   function SectionTitle({ text }) {
     return (
       <h3 className="px-3 py-2 text-gray-600 font-semibold text-sm">{text}</h3>
@@ -51,73 +54,108 @@ function Sidebar({ sidebarOpen }) {
   }
 
   /* ================= DIVIDER ================= */
+
   function Divider() {
     return <div className="my-3 border-t border-gray-100" />;
   }
 
+  /* ================= MOBILE OVERLAY ================= */
+
+  const Overlay = () => (
+    <div
+      className="fixed inset-0 bg-black/40 z-40 md:hidden"
+      onClick={() => setSidebarOpen(false)}
+    />
+  );
+
   /* ================= COLLAPSED ================= */
+
   if (!sidebarOpen) {
     return (
-      <aside className="w-[60px] bg-white h-[calc(100vh-56px)] flex flex-col items-center pt-4 space-y-6">
-        <MiniItem icon={<MdHome />} label="Home" to="/" />
-        <MiniItem icon={<SiYoutubeshorts />} label="Shorts" />
-        <MiniItem icon={<MdSubscriptions />} label="Subs" />
-        <MiniItem icon={<CgProfile />} label="You" />
-      </aside>
+      <>
+        {/* MINI SIDEBAR (DESKTOP) */}
+
+        <aside className="hidden md:flex w-[60px] bg-white h-[calc(100vh-56px)] flex-col items-center pt-4 space-y-6 sticky top-[56px]">
+          <MiniItem icon={<MdHome />} label="Home" to="/" />
+          <MiniItem icon={<SiYoutubeshorts />} label="Shorts" />
+          <MiniItem icon={<MdSubscriptions />} label="Subs" />
+          <MiniItem icon={<CgProfile />} label="You" />
+        </aside>
+      </>
     );
   }
 
   /* ================= EXPANDED ================= */
+
   return (
-    <aside className="w-[200px] bg-white h-[calc(100vh-56px)] overflow-y-auto sidebar-scroll">
-      <div className="px-3 py-4 text-sm">
-        {/* MAIN */}
-        <SidebarItem icon={<MdHome />} text="Home" to="/" />
-        <SidebarItem icon={<SiYoutubeshorts />} text="Shorts" />
-        <SidebarItem icon={<MdSubscriptions />} text="Subscriptions" />
+    <>
+      {/* MOBILE OVERLAY */}
 
-        <Divider />
+      <Overlay />
 
-        {/* YOU */}
-        <SectionTitle text="You" />
-        <SidebarItem icon={<MdHistory />} text="History" />
-        <SidebarItem icon={<MdOutlineVideoLibrary />} text="Playlists" />
-        <SidebarItem icon={<MdOutlineWatchLater />} text="Watch later" />
-        <SidebarItem icon={<MdDownload />} text="Downloads" />
-        <SidebarItem icon={<LuChevronDown />} text="Show more" />
+      <aside
+        className={`fixed md:relative z-50 md:z-auto
+        w-[240px] bg-white h-[calc(100vh-56px)]
+        overflow-y-auto sidebar-scroll
+        transform transition-transform duration-200
+        ${sidebarOpen ? "translate-x-0" : "-translate-x-full"}
+        md:translate-x-0`}
+      >
+        <div className="px-3 py-4 text-sm">
+          {/* MAIN */}
 
-        <Divider />
+          <SidebarItem icon={<MdHome />} text="Home" to="/" />
+          <SidebarItem icon={<SiYoutubeshorts />} text="Shorts" />
+          <SidebarItem icon={<MdSubscriptions />} text="Subscriptions" />
 
-        {/* EXPLORE */}
-        <SectionTitle text="Explore" />
-        <SidebarItem icon={<FaFire />} text="Trending" />
-        <SidebarItem icon={<FaMusic />} text="Music" />
+          <Divider />
 
-        <Divider />
+          {/* YOU */}
 
-        {/* MORE FROM YOUTUBE */}
-        <SectionTitle text="More from YouTube" />
-        <SidebarItem icon={<FaYoutube />} text="YouTube Premium" />
-        <SidebarItem icon={<FaYoutube />} text="YouTube Studio" />
-        <SidebarItem icon={<FaYoutube />} text="YouTube Music" />
+          <SectionTitle text="You" />
+          <SidebarItem icon={<MdHistory />} text="History" />
+          <SidebarItem icon={<MdOutlineVideoLibrary />} text="Playlists" />
+          <SidebarItem icon={<MdOutlineWatchLater />} text="Watch later" />
+          <SidebarItem icon={<MdDownload />} text="Downloads" />
+          <SidebarItem icon={<LuChevronDown />} text="Show more" />
 
-        <Divider />
+          <Divider />
 
-        {/* SETTINGS */}
-        <SidebarItem icon={<MdOutlineSettings />} text="Settings" />
-        <SidebarItem icon={<IoMdHelpCircleOutline />} text="Help" />
+          {/* EXPLORE */}
 
-        {/* FOOTER */}
-        <div className="text-xs text-gray-500 mt-6 space-y-2 leading-relaxed">
-          <p>About Press Copyright</p>
-          <p>Contact us Creators Advertise</p>
-          <p>Developers</p>
-          <p>Terms Privacy Policy & Safety</p>
-          <p>How YouTube works</p>
-          <p className="pt-2">© 2026 YouTube Clone</p>
+          <SectionTitle text="Explore" />
+          <SidebarItem icon={<FaFire />} text="Trending" />
+          <SidebarItem icon={<FaMusic />} text="Music" />
+
+          <Divider />
+
+          {/* MORE FROM YOUTUBE */}
+
+          <SectionTitle text="More from YouTube" />
+          <SidebarItem icon={<FaYoutube />} text="YouTube Premium" />
+          <SidebarItem icon={<FaYoutube />} text="YouTube Studio" />
+          <SidebarItem icon={<FaYoutube />} text="YouTube Music" />
+
+          <Divider />
+
+          {/* SETTINGS */}
+
+          <SidebarItem icon={<MdOutlineSettings />} text="Settings" />
+          <SidebarItem icon={<IoMdHelpCircleOutline />} text="Help" />
+
+          {/* FOOTER */}
+
+          <div className="text-xs text-gray-500 mt-6 space-y-2 leading-relaxed">
+            <p>About Press Copyright</p>
+            <p>Contact us Creators Advertise</p>
+            <p>Developers</p>
+            <p>Terms Privacy Policy & Safety</p>
+            <p>How YouTube works</p>
+            <p className="pt-2">© 2026 YouTube Clone</p>
+          </div>
         </div>
-      </div>
-    </aside>
+      </aside>
+    </>
   );
 }
 
