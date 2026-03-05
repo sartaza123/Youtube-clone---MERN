@@ -25,7 +25,7 @@ The application demonstrates complete frontend–backend integration and follows
 
 TECHNOLOGIES USED
 
-Frontend
+Frontend  
 React.js  
 React Router DOM  
 Axios  
@@ -33,15 +33,15 @@ Tailwind CSS
 React Icons  
 Vite  
 
-Backend
+Backend  
 Node.js  
 Express.js  
 MongoDB  
 Mongoose  
 JSON Web Token (JWT)  
-Multer (File Upload Handling)
+Multer  
 
-Development Tools
+Development Tools  
 Git  
 GitHub  
 Nodemon  
@@ -52,30 +52,30 @@ Postman
 
 FEATURES
 
-Authentication
+Authentication  
 User registration and login  
 JWT based authentication  
 Protected routes  
 
-Channel System
+Channel System  
 Create channel  
 Channel profile page  
 Channel avatar and banner  
 
-Video System
+Video System  
 Upload videos  
 Upload thumbnails  
 Watch video page  
 Video metadata stored in MongoDB  
 
-User Interface
+User Interface  
 Responsive layout  
 Video cards similar to YouTube  
 Channel avatar display  
 Filter bar for categories  
 Navigation header  
 
-Backend API
+Backend API  
 RESTful API architecture  
 Secure middleware for authentication  
 MongoDB models and schema relations  
@@ -166,10 +166,6 @@ server
 ├── middleware
 │   └── auth.middleware.js
 │
-├── uploads
-│   ├── videos
-│   └── thumbnails
-│
 ├── server.js
 └── package.json
 ```
@@ -179,13 +175,14 @@ server
 
 INSTALLATION AND SETUP
 
-1. Clone the repository
+
+Clone the repository
 
 ```bash
 git clone https://github.com/sartaza123/Youtube-clone---MERN.git
 ```
 
-Navigate into the project folder
+Navigate to the project directory
 
 ```bash
 cd Youtube-clone---MERN
@@ -196,15 +193,15 @@ cd Youtube-clone---MERN
 
 REQUIREMENTS
 
-Install the following tools before running the project:
+Install the following tools before running the project
 
 Node.js  
 npm  
-MongoDB (Local installation or MongoDB Atlas)  
+MongoDB (Local or MongoDB Atlas)  
 Git  
 
 
-Check installation versions
+Check installed versions
 
 ```bash
 node -v
@@ -217,7 +214,7 @@ git --version
 
 SETUP ENVIRONMENT VARIABLES
 
-Create a `.env` file inside the **server** directory.
+Create a `.env` file inside the server directory
 
 ```bash
 cd server
@@ -235,30 +232,6 @@ JWT_SECRET=your_secret_key
 
 ------------------------------------------------------------
 
-CREATE REQUIRED UPLOAD FOLDERS
-
-Inside the server directory create upload folders.
-
-```bash
-mkdir uploads
-mkdir uploads/videos
-mkdir uploads/thumbnails
-```
-
-
-Final structure should look like:
-
-```
-server
-│
-├── uploads
-│   ├── videos
-│   └── thumbnails
-```
-
-
-------------------------------------------------------------
-
 INSTALL DEPENDENCIES
 
 
@@ -266,7 +239,13 @@ Install backend dependencies
 
 ```bash
 cd server
-npm install
+npm install express mongoose bcrypt jsonwebtoken multer cors dotenv
+```
+
+Install development dependency for server
+
+```bash
+npm install -D nodemon
 ```
 
 
@@ -274,7 +253,7 @@ Install frontend dependencies
 
 ```bash
 cd ../client
-npm install
+npm install axios progressbar.js react-router-dom react-icons
 ```
 
 
@@ -283,32 +262,28 @@ npm install
 RUN THE APPLICATION
 
 
-Start backend server
+Start Backend Server
 
 ```bash
 cd server
-npm run dev
+npx nodemon server.js
 ```
 
-or
-
-```bash
-npm start
-```
 
 Backend will run on
 
 ```
-http://localhost:5050
+http://localhost:5000
 ```
 
 
-Start frontend
+Start Frontend
 
 ```bash
 cd client
 npm run dev
 ```
+
 
 Frontend will run on
 
@@ -321,9 +296,7 @@ http://localhost:5173
 
 API ENDPOINTS
 
-The frontend communicates with the backend using REST APIs.
-
-Example API routes
+Frontend communicates with backend using REST APIs
 
 ```
 /api/auth
@@ -337,7 +310,7 @@ Example API routes
 
 DEVELOPMENT TOOLS
 
-Recommended development tools
+Recommended tools
 
 VS Code  
 MongoDB Compass  
@@ -358,9 +331,8 @@ https://github.com/sartaza123
 
 LICENSE
 
-This project is developed for educational and learning purposes.
-
-You are free to modify and use this project for learning and experimentation.
+This project is developed for educational and learning purposes.  
+You are free to modify and use this project.
 
 
 ------------------------------------------------------------
@@ -369,7 +341,7 @@ FUTURE IMPROVEMENTS
 
 Video recommendation system  
 Like and dislike functionality  
-Subscriptions  
+Subscriptions system  
 Improved comments system  
 Video streaming optimization  
 Notifications system
