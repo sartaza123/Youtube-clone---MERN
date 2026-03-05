@@ -340,8 +340,7 @@ You are free to modify and use this project.
 FUTURE IMPROVEMENTS
 
 Video recommendation system  
-Own V
-ideo Player 
+Own Video Player 
 Subscriptions system  
 Improved comments system  
 Video streaming optimization  
