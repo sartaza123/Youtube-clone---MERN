@@ -1,24 +1,20 @@
 import { useState, useEffect } from "react";
 import API from "../services/api";
-import { useNavigate, useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 function UploadVideo() {
   const navigate = useNavigate();
-  const location = useLocation();
-
   const { token } = useAuth();
-
-  const editVideo = location.state;
 
   const [channelId, setChannelId] = useState("");
 
   const [formData, setFormData] = useState({
-    title: editVideo?.title || "",
-    description: editVideo?.description || "",
-    thumbnailUrl: editVideo?.thumbnailUrl || "",
-    videoUrl: editVideo?.videoUrl || "",
-    category: editVideo?.category || "",
+    title: "",
+    description: "",
+    thumbnailUrl: "",
+    videoUrl: "",
+    category: "",
   });
 
   const [loading, setLoading] = useState(false);
@@ -27,9 +23,9 @@ function UploadVideo() {
 
   useEffect(() => {
     if (!token) navigate("/login");
-  }, [token, navigate]);
+  }, [token]);
 
-  /* ================= GET MY CHANNEL ================= */
+  /* ================= GET CHANNEL ================= */
 
   useEffect(() => {
     const fetchChannel = async () => {
@@ -43,123 +39,157 @@ function UploadVideo() {
         }
 
         setChannelId(data._id);
-      } catch (err) {
-        console.error(err);
+      } catch {
         navigate("/create-channel");
       }
     };
 
     fetchChannel();
-  }, [navigate]);
+  }, []);
 
   /* ================= HANDLE INPUT ================= */
 
   const handleChange = (e) => {
-    setFormData((prev) => ({
-      ...prev,
+    setFormData({
+      ...formData,
       [e.target.name]: e.target.value,
-    }));
+    });
   };
 
-  /* ================= UPLOAD / UPDATE VIDEO ================= */
+  /* ================= YOUTUBE VALIDATION ================= */
+
+  const isYoutubeLink = (url) => {
+    return url.includes("youtube.com/watch?v=") || url.includes("youtu.be/");
+  };
+
+  /* ================= UPLOAD VIDEO ================= */
 
   const handleUpload = async (e) => {
     e.preventDefault();
 
+    if (!isYoutubeLink(formData.videoUrl)) {
+      alert("Only YouTube video links are supported right now.");
+      return;
+    }
+
+    if (!formData.title.trim()) {
+      alert("Title is required");
+      return;
+    }
+
     setLoading(true);
 
     try {
-      if (editVideo) {
-        await API.put(`/videos/${editVideo._id}`, formData);
+      await API.post("/videos", {
+        ...formData,
+        channel: channelId,
+      });
 
-        alert("Video updated successfully");
-      } else {
-        await API.post("/videos", {
-          ...formData,
-          channel: channelId,
-        });
-
-        alert("Video uploaded successfully");
-      }
+      alert("Video uploaded successfully");
 
       navigate(`/channel/${channelId}`);
     } catch (err) {
       console.error(err);
-      alert("Operation failed");
+      alert("Upload failed");
     } finally {
       setLoading(false);
     }
   };
 
   return (
-    <div className="max-w-3xl mx-auto p-6">
-      <h1 className="text-2xl font-semibold mb-6">
-        {editVideo ? "Edit Video" : "Upload Video"}
-      </h1>
+    <div className="flex justify-center items-start min-h-screen bg-gray-50 pt-10">
+      <div className="w-full max-w-3xl bg-white p-8 rounded-xl shadow">
+        {/* TITLE */}
+        <h1 className="text-2xl font-semibold mb-6">Upload Video</h1>
 
-      <form onSubmit={handleUpload} className="flex flex-col gap-4">
-        <input
-          type="text"
-          name="title"
-          placeholder="Video Title"
-          value={formData.title}
-          onChange={handleChange}
-          required
-          className="border p-3 rounded"
-        />
+        <form onSubmit={handleUpload} className="flex flex-col gap-5">
+          {/* TITLE */}
+          <div>
+            <label className="text-sm font-medium">Title (required)</label>
 
-        <textarea
-          name="description"
-          placeholder="Description"
-          value={formData.description}
-          onChange={handleChange}
-          className="border p-3 rounded"
-        />
+            <input
+              type="text"
+              name="title"
+              placeholder="Add a title that describes your video"
+              value={formData.title}
+              onChange={handleChange}
+              required
+              className="w-full border p-3 rounded mt-1"
+            />
+          </div>
 
-        <input
-          type="text"
-          name="thumbnailUrl"
-          placeholder="Thumbnail URL"
-          value={formData.thumbnailUrl}
-          onChange={handleChange}
-          required
-          className="border p-3 rounded"
-        />
+          {/* DESCRIPTION */}
+          <div>
+            <label className="text-sm font-medium">Description</label>
 
-        <input
-          type="text"
-          name="videoUrl"
-          placeholder="Video URL"
-          value={formData.videoUrl}
-          onChange={handleChange}
-          required
-          className="border p-3 rounded"
-        />
+            <textarea
+              name="description"
+              rows="4"
+              placeholder="Tell viewers about your video"
+              value={formData.description}
+              onChange={handleChange}
+              className="w-full border p-3 rounded mt-1"
+            />
+          </div>
 
-        <input
-          type="text"
-          name="category"
-          placeholder="Category"
-          value={formData.category}
-          onChange={handleChange}
-          required
-          className="border p-3 rounded"
-        />
+          {/* VIDEO URL */}
+          <div>
+            <label className="text-sm font-medium">YouTube Video Link</label>
 
-        <button
-          type="submit"
-          disabled={loading}
-          className="bg-red-600 text-white py-2 rounded hover:bg-red-700"
-        >
-          {loading
-            ? editVideo
-              ? "Updating..."
-              : "Uploading..."
-            : editVideo
-              ? "Update Video"
-              : "Upload Video"}
-        </button>
-      </form>
+            <input
+              type="text"
+              name="videoUrl"
+              placeholder="Paste YouTube link (https://youtu.be/...)"
+              value={formData.videoUrl}
+              onChange={handleChange}
+              required
+              className="w-full border p-3 rounded mt-1"
+            />
+
+            <p className="text-xs text-gray-500 mt-1">
+              Only YouTube links are supported for now
+            </p>
+          </div>
+
+          {/* THUMBNAIL */}
+          <div>
+            <label className="text-sm font-medium">Thumbnail URL</label>
+
+            <input
+              type="text"
+              name="thumbnailUrl"
+              placeholder="Paste thumbnail image link"
+              value={formData.thumbnailUrl}
+              onChange={handleChange}
+              className="w-full border p-3 rounded mt-1"
+            />
+          </div>
+
+          {/* CATEGORY */}
+          <div>
+            <label className="text-sm font-medium">Category</label>
+
+            <input
+              type="text"
+              name="category"
+              placeholder="Music, Coding, Gaming..."
+              value={formData.category}
+              onChange={handleChange}
+              required
+              className="w-full border p-3 rounded mt-1"
+            />
+          </div>
+
+          {/* BUTTON */}
+          <button
+            type="submit"
+            disabled={loading}
+            className="bg-red-600 text-white py-3 rounded hover:bg-red-700 transition"
+          >
+            {loading ? "Uploading..." : "Upload Video"}
+          </button>
+        </form>
+      </div>
     </div>
   );
 }
