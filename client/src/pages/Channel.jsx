@@ -4,10 +4,14 @@ import api from "../services/api";
 import VideoCard from "../components/VideoCard";
 import { useAuth } from "../context/AuthContext";
 import { BsThreeDotsVertical } from "react-icons/bs";
+import { useLocation } from "react-router-dom";
 
 function Channel() {
   const { id } = useParams();
   const navigate = useNavigate();
+
+  const location = useLocation();
+  const editVideo = location.state?.editVideo;
 
   const { userId } = useAuth();
 
@@ -143,7 +147,7 @@ function Channel() {
   };
 
   const handleEditVideo = (video) => {
-    navigate("/upload", { state: video });
+    navigate("/upload", { state: { editVideo: video } });
   };
 
   const avatarUrl =

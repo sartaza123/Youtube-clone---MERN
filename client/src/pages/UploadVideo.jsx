@@ -1,11 +1,14 @@
 import { useState, useEffect } from "react";
 import API from "../services/api";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useLocation } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 function UploadVideo() {
   const navigate = useNavigate();
+  const location = useLocation();
   const { token } = useAuth();
+
+  const editVideo = location.state?.editVideo;
 
   const [channelId, setChannelId] = useState("");
 
@@ -23,7 +26,21 @@ function UploadVideo() {
 
   useEffect(() => {
     if (!token) navigate("/login");
-  }, [token]);
+  }, [token, navigate]);
+
+  /* ================= PREFILL IF EDITING ================= */
+
+  useEffect(() => {
+    if (editVideo) {
+      setFormData({
+        title: editVideo.title || "",
+        description: editVideo.description || "",
+        thumbnailUrl: editVideo.thumbnailUrl || "",
+        videoUrl: editVideo.videoUrl || "",
+        category: editVideo.category || "",
+      });
+    }
+  }, [editVideo]);
 
   /* ================= GET CHANNEL ================= */
 
@@ -45,7 +62,7 @@ function UploadVideo() {
     };
 
     fetchChannel();
-  }, []);
+  }, [navigate]);
 
   /* ================= HANDLE INPUT ================= */
 
@@ -62,7 +79,7 @@ function UploadVideo() {
     return url.includes("youtube.com/watch?v=") || url.includes("youtu.be/");
   };
 
-  /* ================= UPLOAD VIDEO ================= */
+  /* ================= UPLOAD / UPDATE VIDEO ================= */
 
   const handleUpload = async (e) => {
     e.preventDefault();
@@ -80,17 +97,21 @@ function UploadVideo() {
     setLoading(true);
 
     try {
-      await API.post("/videos", {
-        ...formData,
-        channel: channelId,
-      });
-
-      alert("Video uploaded successfully");
+      if (editVideo) {
+        await API.put(`/videos/${editVideo._id}`, formData);
+        alert("Video updated successfully");
+      } else {
+        await API.post("/videos", {
+          ...formData,
+          channel: channelId,
+        });
+        alert("Video uploaded successfully");
+      }
 
       navigate(`/channel/${channelId}`);
     } catch (err) {
       console.error(err);
-      alert("Upload failed");
+      alert("Action failed");
     } finally {
       setLoading(false);
     }
@@ -100,7 +121,9 @@ function UploadVideo() {
     <div className="flex justify-center items-start min-h-screen bg-gray-50 pt-10">
       <div className="w-full max-w-3xl bg-white p-8 rounded-xl shadow">
         {/* TITLE */}
-        <h1 className="text-2xl font-semibold mb-6">Upload Video</h1>
+        <h1 className="text-2xl font-semibold mb-6">
+          {editVideo ? "Edit Video" : "Upload Video"}
+        </h1>
 
         <form onSubmit={handleUpload} className="flex flex-col gap-5">
           {/* TITLE */}
@@ -186,7 +209,11 @@ function UploadVideo() {
             disabled={loading}
             className="bg-red-600 text-white py-3 rounded hover:bg-red-700 transition"
           >
-            {loading ? "Uploading..." : "Upload Video"}
+            {loading
+              ? "Saving..."
+              : editVideo
+                ? "Update Video"
+                : "Upload Video"}
           </button>
         </form>
       </div>
