@@ -1,9 +1,6 @@
-const authMiddleware = require("../middleware/auth.middleware");
+import authMiddleware from "../middleware/auth.middleware.js";
 
-const {
-  likeVideo,
-  dislikeVideo,
-} = require("../controller/reaction.controller");
+import { likeVideo, dislikeVideo } from "../controller/reaction.controller.js";
 
 function reactionRoutes(app) {
   app.put("/api/videos/:id/like", authMiddleware, likeVideo);
@@ -11,4 +8,4 @@ function reactionRoutes(app) {
   app.put("/api/videos/:id/dislike", authMiddleware, dislikeVideo);
 }
 
-module.exports = reactionRoutes;
+export default reactionRoutes;

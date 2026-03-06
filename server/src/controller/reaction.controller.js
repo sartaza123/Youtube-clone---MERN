@@ -1,4 +1,4 @@
-const videoModel = require("../models/video.model");
+import videoModel from "../models/video.model.js";
 
 /* ================= LIKE VIDEO ================= */
 
@@ -81,7 +81,4 @@ async function dislikeVideo(req, res) {
   }
 }
 
-module.exports = {
-  likeVideo,
-  dislikeVideo,
-};
+export { likeVideo, dislikeVideo };

@@ -1,4 +1,4 @@
-const { register, login } = require("../controller/auth.controller");
+import { register, login } from "../controller/auth.controller.js";
 
 function authRoutes(app) {
   // Register
@@ -8,4 +8,4 @@ function authRoutes(app) {
   app.post("/api/auth/login", login);
 }
 
-module.exports = authRoutes;
+export default authRoutes;

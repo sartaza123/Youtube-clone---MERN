@@ -1,4 +1,4 @@
-const commentModel = require("../models/comment.model");
+import commentModel from "../models/comment.model.js";
 
 // ================= ADD COMMENT =================
 async function addComment(req, res) {
@@ -73,9 +73,4 @@ async function deleteComment(req, res) {
   }
 }
 
-module.exports = {
-  addComment,
-  getCommentsByVideo,
-  updateComment,
-  deleteComment,
-};
+export { addComment, getCommentsByVideo, updateComment, deleteComment };

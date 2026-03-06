@@ -1,13 +1,13 @@
-const authMiddleware = require("../middleware/auth.middleware");
+import authMiddleware from "../middleware/auth.middleware.js";
 
-const {
+import {
   createVideo,
   getAllVideos,
   getVideoById,
   updateVideo,
   deleteVideo,
   getVideosByChannel,
-} = require("../controller/video.controller");
+} from "../controller/video.controller.js";
 
 function videoRoutes(app) {
   // Public Routes
@@ -24,4 +24,4 @@ function videoRoutes(app) {
   app.delete("/api/videos/:id", authMiddleware, deleteVideo);
 }
 
-module.exports = videoRoutes;
+export default videoRoutes;

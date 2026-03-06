@@ -1,4 +1,4 @@
-const mongoose = require("mongoose");
+import mongoose from "mongoose";
 
 const videoSchema = new mongoose.Schema(
   {
@@ -32,7 +32,6 @@ const videoSchema = new mongoose.Schema(
       ref: "User",
       default: [],
     },
-
     dislikes: {
       type: [mongoose.Schema.Types.ObjectId],
       ref: "User",
@@ -49,4 +48,4 @@ const videoSchema = new mongoose.Schema(
 
 const videoModel = mongoose.model("Video", videoSchema);
 
-module.exports = videoModel;
+export default videoModel;

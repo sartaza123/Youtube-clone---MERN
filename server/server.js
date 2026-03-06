@@ -1,20 +1,19 @@
 // env config
-require("dotenv").config();
+import dotenv from "dotenv";
+dotenv.config();
 
-// server and Dabatbase connection
-const express = require("express");
-const mongoose = require("mongoose");
+// server and Database connection
+import express from "express";
+import mongoose from "mongoose";
+import cors from "cors";
 
 // importing routes ================
-
-const authRoutes = require("./src/routes/auth.routes");
-const userRoutes = require("./src/routes/user.routes");
-const videoRoutes = require("./src/routes/video.routes");
-const channelRoutes = require("./src/routes/channel.routes");
-const commentRoutes = require("./src/routes/comment.routes");
-const reactionRoutes = require("./src/routes/reaction.routes");
-
-const cors = require("cors");
+import authRoutes from "./src/routes/auth.routes.js";
+import userRoutes from "./src/routes/user.routes.js";
+import videoRoutes from "./src/routes/video.routes.js";
+import channelRoutes from "./src/routes/channel.routes.js";
+import commentRoutes from "./src/routes/comment.routes.js";
+import reactionRoutes from "./src/routes/reaction.routes.js";
 
 const app = express();
 
@@ -42,8 +41,6 @@ videoRoutes(app);
 channelRoutes(app);
 commentRoutes(app);
 reactionRoutes(app);
-
-module.exports = app;
 
 const PORT = process.env.PORT || 4000;
 

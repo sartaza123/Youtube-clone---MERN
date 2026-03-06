@@ -1,10 +1,10 @@
-const authMiddleware = require("../middleware/auth.middleware");
-const {
+import authMiddleware from "../middleware/auth.middleware.js";
+import {
   addComment,
   getCommentsByVideo,
   updateComment,
   deleteComment,
-} = require("../controller/comment.controller");
+} from "../controller/comment.controller.js";
 
 function commentRoutes(app) {
   // Public
@@ -16,4 +16,4 @@ function commentRoutes(app) {
   app.delete("/api/comments/:id", authMiddleware, deleteComment);
 }
 
-module.exports = commentRoutes;
+export default commentRoutes;

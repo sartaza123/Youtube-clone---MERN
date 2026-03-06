@@ -1,5 +1,5 @@
-const videoModel = require("../models/video.model");
-const channelModel = require("../models/channel.model");
+import videoModel from "../models/video.model.js";
+import channelModel from "../models/channel.model.js";
 
 // ================= CREATE VIDEO =================
 async function createVideo(req, res) {
@@ -133,7 +133,7 @@ async function deleteVideo(req, res) {
   }
 }
 
-module.exports = {
+export {
   createVideo,
   getAllVideos,
   getVideoById,

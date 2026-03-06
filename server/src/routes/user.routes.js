@@ -1,9 +1,9 @@
-const getProfile = require("../controller/user.controller");
-const authMiddleware = require("../middleware/auth.middleware");
+import getProfile from "../controller/user.controller.js";
+import authMiddleware from "../middleware/auth.middleware.js";
 
 function userRoutes(app) {
   // Get logged-in user profile
   app.get("/api/users/me", authMiddleware, getProfile);
 }
 
-module.exports = userRoutes;
+export default userRoutes;

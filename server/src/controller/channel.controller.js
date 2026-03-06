@@ -1,4 +1,4 @@
-const channelModel = require("../models/channel.model");
+import channelModel from "../models/channel.model.js";
 
 /* ================= CREATE CHANNEL ================= */
 
@@ -140,7 +140,7 @@ async function deleteChannel(req, res) {
   }
 }
 
-module.exports = {
+export {
   createChannel,
   getChannelById,
   getMyChannel,

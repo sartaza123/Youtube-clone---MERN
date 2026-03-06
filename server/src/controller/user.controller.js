@@ -1,4 +1,4 @@
-const User = require("../models/user.model");
+import User from "../models/user.model.js";
 
 // Get Logged-in User Profile
 async function getProfile(req, res) {
@@ -15,4 +15,4 @@ async function getProfile(req, res) {
   }
 }
 
-module.exports = getProfile;
+export default getProfile;

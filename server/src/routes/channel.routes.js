@@ -1,11 +1,11 @@
-const authMiddleware = require("../middleware/auth.middleware");
-const {
+import authMiddleware from "../middleware/auth.middleware.js";
+import {
   createChannel,
   getChannelById,
   getMyChannel,
   updateChannel,
   deleteChannel,
-} = require("../controller/channel.controller");
+} from "../controller/channel.controller.js";
 
 function channelRoutes(app) {
   // Public routes
@@ -18,4 +18,4 @@ function channelRoutes(app) {
   app.delete("/api/channels/:id", authMiddleware, deleteChannel);
 }
 
-module.exports = channelRoutes;
+export default channelRoutes;
