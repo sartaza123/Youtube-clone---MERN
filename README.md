@@ -8,8 +8,11 @@ The goal of this project is to demonstrate full-stack web development using mode
 Project Repository  
 https://github.com/sartaza123/Youtube-clone---MERN
 
+## Project Presentation Summary Video
 
-------------------------------------------------------------
+https://drive.google.com/file/d/1bl_CPjA1KTuzlvHfPnpGv2ck1GNED6Wh/view?usp=drivesdk
+
+---
 
 PROJECT DETAILS
 
@@ -20,8 +23,7 @@ The frontend is built using React and Tailwind CSS, while the backend is develop
 
 The application demonstrates complete frontend–backend integration and follows a modular architecture for scalability and maintainability.
 
-
-------------------------------------------------------------
+---
 
 TECHNOLOGIES USED
 
@@ -31,7 +33,7 @@ React Router DOM
 Axios  
 Tailwind CSS  
 React Icons  
-Vite  
+Vite
 
 Backend  
 Node.js  
@@ -39,53 +41,50 @@ Express.js
 MongoDB  
 Mongoose  
 JSON Web Token (JWT)  
-Multer  
+Multer
 
 Development Tools  
 Git  
 GitHub  
 Nodemon  
-Postman  
+Postman
 
-
-------------------------------------------------------------
+---
 
 FEATURES
 
 Authentication  
 User registration and login  
 JWT based authentication  
-Protected routes  
+Protected routes
 
 Channel System  
 Create channel  
 Channel profile page  
-Channel avatar and banner  
+Channel avatar and banner
 
 Video System  
 Upload videos  
 Upload thumbnails  
 Watch video page  
-Video metadata stored in MongoDB  
+Video metadata stored in MongoDB
 
 User Interface  
 Responsive layout  
 Video cards similar to YouTube  
 Channel avatar display  
 Filter bar for categories  
-Navigation header  
+Navigation header
 
 Backend API  
 RESTful API architecture  
 Secure middleware for authentication  
 MongoDB models and schema relations  
-File upload management  
+File upload management
 
-
-------------------------------------------------------------
+---
 
 FOLDER STRUCTURE
-
 
 ROOT STRUCTURE
 
@@ -101,7 +100,6 @@ Youtube-clone---MERN
 ├── README.md
 └── package.json
 ```
-
 
 CLIENT STRUCTURE (Frontend)
 
@@ -136,7 +134,6 @@ client
 └── vite.config.js
 ```
 
-
 SERVER STRUCTURE (Backend)
 
 ```
@@ -170,11 +167,9 @@ server
 └── package.json
 ```
 
-
-------------------------------------------------------------
+---
 
 INSTALLATION AND SETUP
-
 
 Clone the repository
 
@@ -185,11 +180,10 @@ git clone https://github.com/sartaza123/Youtube-clone---MERN.git
 Navigate to the project directory
 
 ```bash
-cd Youtube-clone---MERN
+cd Youtube-clone---MERN-main
 ```
 
-
-------------------------------------------------------------
+---
 
 REQUIREMENTS
 
@@ -198,8 +192,7 @@ Install the following tools before running the project
 Node.js  
 npm  
 MongoDB (Local or MongoDB Atlas)  
-Git  
-
+Git
 
 Check installed versions
 
@@ -209,8 +202,7 @@ npm -v
 git --version
 ```
 
-
-------------------------------------------------------------
+---
 
 SETUP ENVIRONMENT VARIABLES
 
@@ -229,11 +221,9 @@ MONGO_URI=your_mongodb_connection_string
 JWT_SECRET=your_secret_key
 ```
 
-
-------------------------------------------------------------
+---
 
 INSTALL DEPENDENCIES
-
 
 Install backend dependencies
 
@@ -248,7 +238,6 @@ Install development dependency for server
 npm install -D nodemon
 ```
 
-
 Install frontend dependencies
 
 ```bash
@@ -256,11 +245,9 @@ cd ../client
 npm install axios progressbar.js react-router-dom react-icons
 ```
 
-
-------------------------------------------------------------
+---
 
 RUN THE APPLICATION
-
 
 Start Backend Server
 
@@ -269,13 +256,11 @@ cd server
 npx nodemon server.js
 ```
 
-
 Backend will run on
 
 ```
 http://localhost:5000
 ```
-
 
 Start Frontend
 
@@ -284,15 +269,13 @@ cd client
 npm run dev
 ```
 
-
 Frontend will run on
 
 ```
 http://localhost:5173
 ```
 
-
-------------------------------------------------------------
+---
 
 API ENDPOINTS
 
@@ -305,8 +288,7 @@ Frontend communicates with backend using REST APIs
 /api/comments
 ```
 
-
-------------------------------------------------------------
+---
 
 DEVELOPMENT TOOLS
 
@@ -314,10 +296,9 @@ Recommended tools
 
 VS Code  
 MongoDB Compass  
-Postman for API testing  
+Postman for API testing
 
-
-------------------------------------------------------------
+---
 
 AUTHOR
 
@@ -326,21 +307,19 @@ Md Sartaz Ansari
 GitHub  
 https://github.com/sartaza123
 
-
-------------------------------------------------------------
+---
 
 LICENSE
 
 This project is developed for educational and learning purposes.  
 You are free to modify and use this project.
 
-
-------------------------------------------------------------
+---
 
 FUTURE IMPROVEMENTS
 
 Video recommendation system  
-Own Video Player 
+Own Video Player
 Subscriptions system  
 Improved comments system  
 Video streaming optimization  

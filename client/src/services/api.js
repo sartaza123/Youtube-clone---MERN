@@ -2,8 +2,8 @@ import axios from "axios";
 import NProgress from "../utils/progress";
 
 const API = axios.create({
-  // baseURL: "http://localhost:5050/api",
-  baseURL: "https://youtube-clone-mern-37z7.onrender.com",
+  baseURL: "http://localhost:5050/api",
+  // baseURL: "https://youtube-clone-mern-37z7.onrender.com",
 });
 
 /* START PROGRESS */
